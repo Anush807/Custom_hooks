@@ -2,74 +2,39 @@ import React, { useEffect, useState } from 'react'
 
 import axios from "axios";
 
+const useMousePointer = () => {
+      const [mousePoint, setMousePoint] = useState({x: 0, y: 0});
 
-function useTodos(n){
-  const [todos, setTodos] = useState([]);
-  const [loading,setLoading] = useState(true);
+      const handleMousemove = (e) =>{
+        setMousePoint({ x: e.clientX, y: e.clientY})
+      }
 
-  useEffect( () =>{
+    useEffect(() =>{
 
-    const value = setInterval( () => {
-      axios.get("http://localhost:3000/random-todo").then(res => {
-        setTodos(res.data.todos);
-        setLoading(false);
-      })
-      
-    },n * 1000 )
-   
-    axios.get("http://localhost:3000/random-todo").then(res => {
-      setTodos(res.data.todos);
-      setLoading(false);
-    })
-      
-    return () => {
-      clearInterval(value)
+          window.addEventListener("mousemove", handleMousemove)
+      return () =>{
+        window.removeEventListener("mousemove", handleMousemove)
+      }
+         
+
+    }, [])
+
+    return mousePoint
+
     }
-      
-    
-  },[n])
 
-return {todos, loading}
-}
 
 function App() {
 
-   const {todos, loading} = useTodos(5);
+   const mousePoint  = useMousePointer();
 
-if(loading){
-  return (
+
+   return (
     <div>
-        Loading.....
+      Your mouse position { mousePoint.x} { mousePoint.y}
     </div>
    )
+
 }
-  
  
-  return (
-    <>
-      {todos.map(todo => <DisplayTodos todo = {todo}></DisplayTodos>)}
-    </>
-  )
-}
-
-function DisplayTodos({todo}){
-  return (
-
-    <div>
-    <div>
-      {todo.title}
-    </div>
-  
-    <br></br>
-    <div>
-      {todo.description}
-    </div>
-  
-    </div>
-  )
-
-} 
-
-
-
 export default App
